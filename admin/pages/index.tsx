@@ -1,8 +1,4 @@
-import * as React from 'react'
-import { GenericPage } from '@contember/admin'
+import { GenericPage } from "@contember/admin"
+import * as React from "react"
 
-export const index = (
-	<GenericPage>
-		Welcome to Contember Admin!
-	</GenericPage>
-)
+export const index = <GenericPage>Ahoj Vietnam!</GenericPage>
