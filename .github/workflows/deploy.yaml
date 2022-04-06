@@ -43,11 +43,7 @@ jobs:
           args: project:validate workspace
 
       - name: Build Admin
-        env:
-          NODE_ENV: production
-          VITE_CONTEMBER_ADMIN_API_BASE_URL: "/_api"
-          VITE_CONTEMBER_ADMIN_SESSION_TOKEN: "__SESSION_TOKEN__"
-        run: node_modules/.bin/vite build "admin" --config vite.config.ts --base "/" --mode prod
+        run: npm run build-admin
 
       - name: Deploy Prod
         uses: docker://contember/cli:1.1.0-alpha.5
