@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - "deploy/prod"
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set Project Name
+        run: echo "PROJECT=ahoj-vietnam" >> $GITHUB_ENV
+
+      - name: Setup repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check that deploy branch is behind main
+        run: git merge-base --is-ancestor HEAD refs/remotes/origin/main
+
+      - name: Setup node
+        uses: actions/setup-node@main
+        with:
+          node-version: 16
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # - name: ESLint
+      #   run: node_modules/.bin/eslint "projects/$PROJECT/**/*.{ts,tsx}"
+
+      - name: TypeScript
+        run: node_modules/.bin/tsc
+
+      - name: Validate Schema
+        uses: docker://contember/cli:1.1.0-alpha.5
+        with:
+          args: project:validate ${{ env.PROJECT }}
+
+      - name: Build Admin
+        env:
+          NODE_ENV: production
+          VITE_CONTEMBER_ADMIN_API_BASE_URL: "/_api"
+          VITE_CONTEMBER_ADMIN_SESSION_TOKEN: "__SESSION_TOKEN__"
+        run: node_modules/.bin/vite build "admin" --config vite.config.ts --base "/" --mode prod
+
+      - name: Deploy Prod
+        uses: docker://contember/cli:1.1.0-alpha.5
+        env:
+          CONTEMBER_API_URL: https://api-ahoj-vietnam.eu.contember.cloud
+          CONTEMBER_API_TOKEN: ${{ secrets.CONTEMBER_DEPLOY_TOKEN }}
+        with:
+          args: deploy ${{ env.PROJECT }} --admin https://ahoj-vietnam.eu.contember.cloud --yes
