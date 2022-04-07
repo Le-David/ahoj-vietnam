@@ -48,14 +48,8 @@ jobs:
       - name: Build Admin
         run: npm run build-admin
 
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/deploy/prod' }}
-    needs: build
-
-    steps:
       - name: Deploy Prod
+        if: ${{ github.ref == 'refs/heads/deploy/prod' }}
         uses: docker://contember/cli:1.1.0-alpha.5
         env:
           CONTEMBER_API_URL: https://api-ahoj-vietnam.eu.contember.cloud
