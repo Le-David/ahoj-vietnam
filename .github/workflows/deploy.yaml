@@ -37,10 +37,12 @@ jobs:
       - name: TypeScript
         run: node_modules/.bin/tsc
 
-      # - name: Validate Schema
-      #   uses: docker://contember/cli:1.1.0-alpha.5
-      #   with:
-      #     args: project:validate ${{ env.PROJECT }}
+      - name: Validate Schema
+        uses: docker://contember/cli:1.1.0-alpha.5
+        env:
+          CONTEMBER_PROJECT_NAME: ${{ env.PROJECT }}
+        with:
+          args: project:validate ${{ env.PROJECT }}
 
       - name: Build Admin
         run: npm run build-admin
